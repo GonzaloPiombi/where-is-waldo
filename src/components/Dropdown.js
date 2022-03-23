@@ -2,9 +2,9 @@ const Dropdown = (props) => {
   return (
     <div className="context-menu" style={{ top: props.y, left: props.x }}>
       <ul>
-        <li>Waldo</li>
-        <li>Wizard</li>
-        <li>Odlaw</li>
+        <li onClick={props.onSelection}>Waldo</li>
+        <li onClick={props.onSelection}>Whitebeard</li>
+        <li onClick={props.onSelection}>Odlaw</li>
       </ul>
     </div>
   );
