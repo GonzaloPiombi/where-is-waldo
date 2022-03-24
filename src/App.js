@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Header from './components/Header';
 import Dropdown from './components/Dropdown';
 import gameImage from './images/wally.jpg';
 import './App.css';
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
+import charactersInfo from './CharactersInfo';
 
 function App() {
   const [dropdown, setDropdown] = useState(false);
@@ -11,6 +12,7 @@ function App() {
   const [y, setY] = useState(null);
   const [dropdownX, setDropdownX] = useState(null);
   const [dropdownY, setDropdownY] = useState(null);
+  const [characters, setCharacters] = useState(charactersInfo);
 
   const handleClick = (e) => {
     setX(
@@ -29,20 +31,20 @@ function App() {
   };
 
   const handleSelection = (e) => {
+    console.log(e);
     //Check if coordinates are within the character boundaries.
     const db = getFirestore();
     const colRef = collection(db, 'characters');
 
     getDocs(colRef)
       .then((snapshot) => {
-        let characters = [];
+        let chars = [];
         snapshot.docs.forEach((doc) => {
-          characters.push({ ...doc.data(), id: doc.id });
+          chars.push({ ...doc.data(), id: doc.id });
         });
-        const char = characters.find(
-          (char) => char.name === e.target.textContent
-        );
+        const char = chars.find((char) => char.name === e.target.id);
         if (x > char.minX && x < char.maxX && y > char.minY && y < char.maxY) {
+          markAsFound(char.name);
           //TODO Remove alerts and replace with a snackbar or similar.
           alert(`You found ${char.name}!`);
         } else {
@@ -52,6 +54,13 @@ function App() {
       .catch((error) => console.log(error));
 
     setDropdown(!dropdown);
+  };
+
+  const markAsFound = (name) => {
+    const newArr = [...characters];
+    const character = newArr.find((character) => character.name === name);
+    character.found = true;
+    setCharacters(newArr);
   };
 
   return (
@@ -65,7 +74,12 @@ function App() {
         draggable="false"
       />
       {dropdown ? (
-        <Dropdown x={dropdownX} y={dropdownY} onSelection={handleSelection} />
+        <Dropdown
+          x={dropdownX}
+          y={dropdownY}
+          onSelection={handleSelection}
+          characters={characters}
+        />
       ) : null}
     </div>
   );
