@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Header from './components/Header';
 import Dropdown from './components/Dropdown';
+import Instructions from './components/Instructions';
 import gameImage from './images/wally.jpg';
 import './App.css';
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
@@ -13,6 +14,7 @@ function App() {
   const [dropdownX, setDropdownX] = useState(null);
   const [dropdownY, setDropdownY] = useState(null);
   const [characters, setCharacters] = useState(charactersInfo);
+  const [instructions, setIntructions] = useState(true);
 
   const handleClick = (e) => {
     setX(
@@ -70,9 +72,16 @@ function App() {
     }
   };
 
+  const handleInstructionsClick = () => {
+    setIntructions(!instructions);
+  };
+
   return (
     <div className="App">
-      <Header />
+      {instructions ? (
+        <Instructions onBtnClick={handleInstructionsClick} />
+      ) : null}
+      <Header onBtnClick={handleInstructionsClick} />
       <img
         src={gameImage}
         alt="Where's Waldo"
