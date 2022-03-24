@@ -47,6 +47,7 @@ function App() {
           markAsFound(char.name);
           //TODO Remove alerts and replace with a snackbar or similar.
           alert(`You found ${char.name}!`);
+          checkForWin();
         } else {
           alert('Keep looking!');
         }
@@ -61,6 +62,12 @@ function App() {
     const character = newArr.find((character) => character.name === name);
     character.found = true;
     setCharacters(newArr);
+  };
+
+  const checkForWin = () => {
+    if (characters.every((character) => character.found === true)) {
+      return alert('You win!');
+    }
   };
 
   return (
