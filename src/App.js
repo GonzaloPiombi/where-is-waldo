@@ -9,20 +9,23 @@ function App() {
   const [dropdown, setDropdown] = useState(false);
   const [x, setX] = useState(null);
   const [y, setY] = useState(null);
-  const [width, setWidth] = useState(null);
-  const [height, setHeight] = useState(null);
-
-  useEffect(() => {
-    console.log(x, y, width, height);
-    console.log(x / width, y / height);
-  }, [x, y, width, height]);
+  const [dropdownX, setDropdownX] = useState(null);
+  const [dropdownY, setDropdownY] = useState(null);
 
   const handleClick = (e) => {
+    setX(
+      Math.round(
+        (e.nativeEvent.offsetX / e.nativeEvent.target.offsetWidth) * 100
+      )
+    );
+    setY(
+      Math.round(
+        (e.nativeEvent.offsetY / e.nativeEvent.target.offsetHeight) * 100
+      )
+    );
+    setDropdownX(e.pageX);
+    setDropdownY(e.pageY);
     setDropdown(!dropdown);
-    setX(e.pageX);
-    setY(e.pageY);
-    setWidth(e.target.offsetWidth);
-    setHeight(e.target.offsetHeight);
   };
 
   const handleSelection = (e) => {
@@ -39,12 +42,8 @@ function App() {
         const char = characters.find(
           (char) => char.name === e.target.textContent
         );
-        if (
-          x / width > char.minX &&
-          x / width < char.maxX &&
-          y / height > char.minY &&
-          y / height < char.maxY
-        ) {
+        if (x > char.minX && x < char.maxX && y > char.minY && y < char.maxY) {
+          //TODO Remove alerts and replace with a snackbar or similar.
           alert(`You found ${char.name}!`);
         } else {
           alert('Keep looking!');
@@ -65,7 +64,9 @@ function App() {
         onClick={handleClick}
         draggable="false"
       />
-      {dropdown ? <Dropdown x={x} y={y} onSelection={handleSelection} /> : null}
+      {dropdown ? (
+        <Dropdown x={dropdownX} y={dropdownY} onSelection={handleSelection} />
+      ) : null}
     </div>
   );
 }
