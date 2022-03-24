@@ -1,11 +1,20 @@
 const Dropdown = (props) => {
   return (
     <div className="context-menu" style={{ top: props.y, left: props.x }}>
-      <ul>
-        <li onClick={props.onSelection}>Waldo</li>
-        <li onClick={props.onSelection}>Whitebeard</li>
-        <li onClick={props.onSelection}>Odlaw</li>
-      </ul>
+      {props.characters.map((character) => {
+        if (!character.found) {
+          return (
+            <div
+              key={character.name}
+              id={character.name}
+              onClick={props.onSelection}
+            >
+              <img src={character.image} alt={character.name} />
+              <p>{character.name}</p>
+            </div>
+          );
+        }
+      })}
     </div>
   );
 };
