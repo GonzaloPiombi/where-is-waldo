@@ -1,6 +1,9 @@
 const Dropdown = (props) => {
   return (
-    <div className="context-menu" style={{ top: props.y, left: props.x }}>
+    <div
+      className="context-menu"
+      style={{ top: props.y + 15, left: props.x + 15 }}
+    >
       {props.characters.map((character) => {
         if (!character.found) {
           return (
