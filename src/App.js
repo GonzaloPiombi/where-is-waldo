@@ -6,15 +6,19 @@ import gameImage from './images/wally.jpg';
 import './App.css';
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import charactersInfo from './CharactersInfo';
+import TargetBox from './components/TargetBox';
+import Snackbar from './components/Snackbar';
 
 function App() {
-  const [dropdown, setDropdown] = useState(false);
   const [x, setX] = useState(null);
   const [y, setY] = useState(null);
+  const [dropdown, setDropdown] = useState(false);
   const [dropdownX, setDropdownX] = useState(null);
   const [dropdownY, setDropdownY] = useState(null);
   const [characters, setCharacters] = useState(charactersInfo);
   const [instructions, setIntructions] = useState(true);
+  const [snackbar, setSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState(null);
 
   const handleClick = (e) => {
     setX(
@@ -33,7 +37,6 @@ function App() {
   };
 
   const handleSelection = (e) => {
-    console.log(e);
     //Check if coordinates are within the character boundaries.
     const db = getFirestore();
     const colRef = collection(db, 'characters');
@@ -48,10 +51,10 @@ function App() {
         if (x > char.minX && x < char.maxX && y > char.minY && y < char.maxY) {
           markAsFound(char.name);
           //TODO Remove alerts and replace with a snackbar or similar.
-          alert(`You found ${char.name}!`);
+          showSnackbar(`You found ${char.name}!`, 'green');
           checkForWin();
         } else {
-          alert('Keep looking!');
+          showSnackbar(`${char.name} isn't there!`, 'red');
         }
       })
       .catch((error) => console.log(error));
@@ -76,12 +79,20 @@ function App() {
     setIntructions(!instructions);
   };
 
+  const showSnackbar = (message, color) => {
+    setSnackbarMessage({ message: message, color: color });
+    setSnackbar(true);
+    setTimeout(() => {
+      setSnackbar(false);
+    }, 2500);
+  };
+
   return (
     <div className="App">
       {instructions ? (
         <Instructions onBtnClick={handleInstructionsClick} />
       ) : null}
-      <Header onBtnClick={handleInstructionsClick} />
+      <Header onBtnClick={handleInstructionsClick} characters={characters} />
       <img
         src={gameImage}
         alt="Where's Waldo"
@@ -90,13 +101,17 @@ function App() {
         draggable="false"
       />
       {dropdown ? (
-        <Dropdown
-          x={dropdownX}
-          y={dropdownY}
-          onSelection={handleSelection}
-          characters={characters}
-        />
+        <div>
+          <Dropdown
+            x={dropdownX}
+            y={dropdownY}
+            onSelection={handleSelection}
+            characters={characters}
+          />{' '}
+          <TargetBox x={dropdownX} y={dropdownY} />
+        </div>
       ) : null}
+      {snackbar ? <Snackbar content={snackbarMessage} /> : null}
     </div>
   );
 }
