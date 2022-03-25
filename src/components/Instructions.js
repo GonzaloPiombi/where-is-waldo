@@ -25,7 +25,9 @@ const Instructions = (props) => {
             <p>Whitebeard</p>
           </div>
         </div>
-        <button onClick={props.onBtnClick}>Got it!</button>
+        <button onClick={props.onBtnClick} autoFocus>
+          Got it!
+        </button>
       </div>
     </div>
   );
