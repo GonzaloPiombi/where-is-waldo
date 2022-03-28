@@ -7,6 +7,8 @@ import charactersInfo from './CharactersInfo';
 import TargetBox from './components/TargetBox';
 import Snackbar from './components/Snackbar';
 import WinMessage from './components/WinMessage';
+import Leaderboard from './components/Leaderboard';
+import { formatTime } from './helpers';
 import './App.css';
 import {
   getFirestore,
@@ -17,6 +19,8 @@ import {
   doc,
   updateDoc,
   getDoc,
+  query,
+  orderBy,
 } from 'firebase/firestore';
 
 function App() {
@@ -32,7 +36,8 @@ function App() {
   const [isGameRunning, setIsGameRunning] = useState(false);
   const [isGameOver, setIsGameOver] = useState(false);
   const [id, setId] = useState(null);
-  const [score, setScore] = useState(null);
+  const [score, setScore] = useState([]);
+  const [isLeaderboard, setIsLeaderboard] = useState(false);
 
   const db = getFirestore();
 
@@ -133,6 +138,35 @@ function App() {
         });
       });
     console.log(docRef);
+    showLeaderboard(true);
+  };
+
+  const showLeaderboard = () => {
+    setIsGameOver(false);
+    setIsLeaderboard(true);
+    getScores();
+  };
+
+  const getScores = () => {
+    const colRef = collection(db, 'leaderboard');
+    const q = query(colRef, orderBy('totalTime'));
+    let score = [];
+    //Get all the documents ordered by the time that it took to complete the game.
+    getDocs(q).then((snapshot) => {
+      snapshot.docs.forEach((doc) => {
+        const data = doc.data();
+        if (data.totalTime === null) {
+          return;
+        } else {
+          score.push({ ...doc.data(), id: doc.id });
+        }
+      });
+      //Format the time as it is displayed as seconds currently.
+      score.forEach((entry) => {
+        entry.totalTime = formatTime(entry.totalTime);
+      });
+      setScore(score);
+    });
   };
 
   return (
@@ -144,6 +178,7 @@ function App() {
         onBtnClick={handleInstructionsClick}
         characters={characters}
         isGameRunning={isGameRunning}
+        showLeaderboard={showLeaderboard}
       />
       <img
         src={gameImage}
@@ -165,6 +200,7 @@ function App() {
       ) : null}
       {snackbar ? <Snackbar content={snackbarMessage} /> : null}
       {isGameOver ? <WinMessage formSubmit={submitScore} /> : null}
+      {isLeaderboard ? <Leaderboard score={score} /> : null}
     </div>
   );
 }
