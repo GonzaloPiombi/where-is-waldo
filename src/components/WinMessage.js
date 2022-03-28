@@ -1,7 +1,8 @@
 import { useState } from 'react';
+import waldo from '../images/waldo.jpg';
 
 const WinMessage = (props) => {
-  const [name, setName] = useState(null);
+  const [name, setName] = useState('');
 
   const playAgain = () => {
     window.location.href = window.location.href;
@@ -13,9 +14,12 @@ const WinMessage = (props) => {
 
   return (
     <div className="modal">
-      <div>
-        <h1>You win!</h1>
-        <p>Your time was: </p>
+      <div className="container">
+        <div className="win-message">
+          <img className="win-image" src={waldo} alt="waldo" />
+          <h1>You win!</h1>
+          <img className="win-image" src={waldo} alt="waldo" />
+        </div>
         <form onSubmit={(e) => props.formSubmit(e, name)}>
           <label htmlFor="name">Enter your name for the leaderboards!</label>
           <input
@@ -23,6 +27,8 @@ const WinMessage = (props) => {
             type="text"
             id="name"
             name="name"
+            required
+            autoFocus
           ></input>
           <button type="submit">Submit</button>
         </form>
