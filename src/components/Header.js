@@ -26,7 +26,7 @@ const Header = (props) => {
         ))}
       </div>
       <Timer isGameRunning={props.isGameRunning} />
-      <button>Leaderboard</button>
+      <button onClick={props.showLeaderboard}>Leaderboard</button>
     </header>
   );
 };
