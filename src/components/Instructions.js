@@ -5,7 +5,7 @@ import wizard from '../images/wizard.jpg';
 const Instructions = (props) => {
   return (
     <div className="modal">
-      <div>
+      <div className="container">
         <h1>Find them!</h1>
         <p>
           Try to find all of them in the shortest time possible to enter the
@@ -13,15 +13,15 @@ const Instructions = (props) => {
         </p>
         <div className="characters-container">
           <div>
-            <img className="headshot" src={waldo} alt="waldo" />
+            <img className="instructions-image" src={waldo} alt="waldo" />
             <p>Waldo</p>
           </div>
           <div>
-            <img className="headshot" src={odlaw} alt="odlaw" />
+            <img className="instructions-image" src={odlaw} alt="odlaw" />
             <p>Odlaw</p>
           </div>
           <div>
-            <img className="headshot" src={wizard} alt="whitebeard" />
+            <img className="instructions-image" src={wizard} alt="whitebeard" />
             <p>Whitebeard</p>
           </div>
         </div>
