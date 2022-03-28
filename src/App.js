@@ -3,11 +3,21 @@ import Header from './components/Header';
 import Dropdown from './components/Dropdown';
 import Instructions from './components/Instructions';
 import gameImage from './images/wally.jpg';
-import './App.css';
-import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import charactersInfo from './CharactersInfo';
 import TargetBox from './components/TargetBox';
 import Snackbar from './components/Snackbar';
+import WinMessage from './components/WinMessage';
+import './App.css';
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  addDoc,
+  serverTimestamp,
+  doc,
+  updateDoc,
+  getDoc,
+} from 'firebase/firestore';
 
 function App() {
   const [x, setX] = useState(null);
@@ -19,6 +29,12 @@ function App() {
   const [instructions, setIntructions] = useState(true);
   const [snackbar, setSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState(null);
+  const [isGameRunning, setIsGameRunning] = useState(false);
+  const [isGameOver, setIsGameOver] = useState(false);
+  const [id, setId] = useState(null);
+  const [score, setScore] = useState(null);
+
+  const db = getFirestore();
 
   const handleClick = (e) => {
     setX(
@@ -34,11 +50,11 @@ function App() {
     setDropdownX(e.pageX);
     setDropdownY(e.pageY);
     setDropdown(!dropdown);
+    setSnackbar(false);
   };
 
   const handleSelection = (e) => {
     //Check if coordinates are within the character boundaries.
-    const db = getFirestore();
     const colRef = collection(db, 'characters');
 
     getDocs(colRef)
@@ -50,7 +66,6 @@ function App() {
         const char = chars.find((char) => char.name === e.target.id);
         if (x > char.minX && x < char.maxX && y > char.minY && y < char.maxY) {
           markAsFound(char.name);
-          //TODO Remove alerts and replace with a snackbar or similar.
           showSnackbar(`You found ${char.name}!`, 'green');
           checkForWin();
         } else {
@@ -71,12 +86,27 @@ function App() {
 
   const checkForWin = () => {
     if (characters.every((character) => character.found === true)) {
-      return alert('You win!');
+      const docRef = doc(db, 'leaderboard', id);
+      updateDoc(docRef, {
+        endTime: serverTimestamp(),
+      });
+      //Stop the timer.
+      setIsGameRunning(false);
+      //Display the win message.
+      setIsGameOver(true);
     }
   };
 
   const handleInstructionsClick = () => {
-    setIntructions(!instructions);
+    setIntructions(false);
+    setIsGameRunning(true);
+    const colRef = collection(db, 'leaderboard');
+    addDoc(colRef, {
+      name: '',
+      startTime: serverTimestamp(),
+      endTime: null,
+      totalTime: null,
+    }).then((docRef) => setId(docRef.id));
   };
 
   const showSnackbar = (message, color) => {
@@ -87,12 +117,34 @@ function App() {
     }, 2500);
   };
 
+  const submitScore = (e, name) => {
+    e.preventDefault();
+    const docRef = doc(db, 'leaderboard', id);
+    let score = null;
+    getDoc(docRef)
+      .then((snapshot) => {
+        const data = snapshot.data();
+        score = data.endTime.seconds - data.startTime.seconds;
+      })
+      .then(() => {
+        updateDoc(docRef, {
+          name: name,
+          totalTime: score,
+        });
+      });
+    console.log(docRef);
+  };
+
   return (
     <div className="App">
       {instructions ? (
         <Instructions onBtnClick={handleInstructionsClick} />
       ) : null}
-      <Header onBtnClick={handleInstructionsClick} characters={characters} />
+      <Header
+        onBtnClick={handleInstructionsClick}
+        characters={characters}
+        isGameRunning={isGameRunning}
+      />
       <img
         src={gameImage}
         alt="Where's Waldo"
@@ -112,6 +164,7 @@ function App() {
         </div>
       ) : null}
       {snackbar ? <Snackbar content={snackbarMessage} /> : null}
+      {isGameOver ? <WinMessage formSubmit={submitScore} /> : null}
     </div>
   );
 }
