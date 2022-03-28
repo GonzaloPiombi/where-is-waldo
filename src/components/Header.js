@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Timer from './Timer';
 
 const Header = (props) => {
   const [opacity, setOpacity] = useState(1);
@@ -24,11 +25,8 @@ const Header = (props) => {
           />
         ))}
       </div>
-      <p>Time</p>
+      <Timer isGameRunning={props.isGameRunning} />
       <button>Leaderboard</button>
-      <button className="help-button" onClick={props.onBtnClick}>
-        ?
-      </button>
     </header>
   );
 };
