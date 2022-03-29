@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Header from './components/Header';
 import Dropdown from './components/Dropdown';
 import Instructions from './components/Instructions';
@@ -21,6 +21,7 @@ import {
   getDoc,
   query,
   orderBy,
+  onSnapshot,
 } from 'firebase/firestore';
 
 function App() {
@@ -38,8 +39,9 @@ function App() {
   const [id, setId] = useState(null);
   const [score, setScore] = useState([]);
   const [isLeaderboard, setIsLeaderboard] = useState(false);
-
   const db = getFirestore();
+
+  useEffect(() => {}, []);
 
   const handleClick = (e) => {
     setX(
@@ -136,15 +138,15 @@ function App() {
           name: name,
           totalTime: score,
         });
-      });
-    console.log(docRef);
-    showLeaderboard(true);
+      })
+      .then(() => showLeaderboard());
+    // showLeaderboard();
   };
 
-  const showLeaderboard = () => {
+  const showLeaderboard = async () => {
     setIsGameOver(false);
-    setIsLeaderboard(true);
     getScores();
+    setIsLeaderboard(true);
   };
 
   const getScores = () => {
@@ -165,8 +167,13 @@ function App() {
       score.forEach((entry) => {
         entry.totalTime = formatTime(entry.totalTime);
       });
+      console.log(score);
       setScore(score);
     });
+  };
+
+  const playAgain = () => {
+    window.location.href = window.location.href;
   };
 
   return (
@@ -199,8 +206,12 @@ function App() {
         </div>
       ) : null}
       {snackbar ? <Snackbar content={snackbarMessage} /> : null}
-      {isGameOver ? <WinMessage formSubmit={submitScore} /> : null}
-      {isLeaderboard ? <Leaderboard score={score} /> : null}
+      {isGameOver ? (
+        <WinMessage formSubmit={submitScore} playAgain={playAgain} />
+      ) : null}
+      {isLeaderboard ? (
+        <Leaderboard score={score} playAgain={playAgain} />
+      ) : null}
     </div>
   );
 }
