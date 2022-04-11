@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Header from './components/Header';
 import Dropdown from './components/Dropdown';
 import Instructions from './components/Instructions';
@@ -8,7 +8,6 @@ import TargetBox from './components/TargetBox';
 import Snackbar from './components/Snackbar';
 import WinMessage from './components/WinMessage';
 import Leaderboard from './components/Leaderboard';
-import { formatTime } from './helpers';
 import './App.css';
 import {
   getFirestore,
@@ -19,9 +18,6 @@ import {
   doc,
   updateDoc,
   getDoc,
-  query,
-  orderBy,
-  onSnapshot,
 } from 'firebase/firestore';
 
 function App() {
@@ -37,11 +33,8 @@ function App() {
   const [isGameRunning, setIsGameRunning] = useState(false);
   const [isGameOver, setIsGameOver] = useState(false);
   const [id, setId] = useState(null);
-  const [score, setScore] = useState([]);
   const [isLeaderboard, setIsLeaderboard] = useState(false);
   const db = getFirestore();
-
-  useEffect(() => {}, []);
 
   const handleClick = (e) => {
     setX(
@@ -124,56 +117,22 @@ function App() {
     }, 2500);
   };
 
-  const submitScore = (e, name) => {
+  const submitScore = async (e, name) => {
     e.preventDefault();
     const docRef = doc(db, 'leaderboard', id);
     let score = null;
-    getDoc(docRef)
-      .then((snapshot) => {
-        const data = snapshot.data();
-        score = data.endTime.seconds - data.startTime.seconds;
-      })
-      .then(() => {
-        updateDoc(docRef, {
-          name: name,
-          totalTime: score,
-        });
-      })
-      .then(() => showLeaderboard());
-    // showLeaderboard();
+    const snapshot = await getDoc(docRef);
+    const data = snapshot.data();
+    score = data.endTime.seconds - data.startTime.seconds;
+
+    await updateDoc(docRef, {
+      name: name,
+      totalTime: score,
+    }).then(() => setIsLeaderboard(() => true));
   };
 
-  const showLeaderboard = async () => {
-    setIsGameOver(false);
-    getScores();
-    setIsLeaderboard(true);
-  };
-
-  const getScores = () => {
-    const colRef = collection(db, 'leaderboard');
-    const q = query(colRef, orderBy('totalTime'));
-    let score = [];
-    //Get all the documents ordered by the time that it took to complete the game.
-    getDocs(q).then((snapshot) => {
-      snapshot.docs.forEach((doc) => {
-        const data = doc.data();
-        if (data.totalTime === null) {
-          return;
-        } else {
-          score.push({ ...doc.data(), id: doc.id });
-        }
-      });
-      //Format the time as it is displayed as seconds currently.
-      score.forEach((entry) => {
-        entry.totalTime = formatTime(entry.totalTime);
-      });
-      console.log(score);
-      setScore(score);
-    });
-  };
-
-  const playAgain = () => {
-    window.location.href = window.location.href;
+  const closeLeaderboard = () => {
+    setIsLeaderboard(false);
   };
 
   return (
@@ -185,7 +144,7 @@ function App() {
         onBtnClick={handleInstructionsClick}
         characters={characters}
         isGameRunning={isGameRunning}
-        showLeaderboard={showLeaderboard}
+        // showLeaderboard={showLeaderboard}
       />
       <img
         src={gameImage}
@@ -206,11 +165,12 @@ function App() {
         </div>
       ) : null}
       {snackbar ? <Snackbar content={snackbarMessage} /> : null}
-      {isGameOver ? (
-        <WinMessage formSubmit={submitScore} playAgain={playAgain} />
-      ) : null}
+      {isGameOver ? <WinMessage formSubmit={submitScore} /> : null}
       {isLeaderboard ? (
-        <Leaderboard score={score} playAgain={playAgain} />
+        <Leaderboard
+          closeLeaderboard={closeLeaderboard}
+          colRef={collection(db, 'leaderboard')}
+        />
       ) : null}
     </div>
   );
