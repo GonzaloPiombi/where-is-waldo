@@ -131,6 +131,10 @@ function App() {
     }).then(() => setIsLeaderboard(() => true));
   };
 
+  const showLeaderboard = () => {
+    setIsLeaderboard(true);
+  };
+
   const closeLeaderboard = () => {
     setIsLeaderboard(false);
   };
@@ -144,7 +148,7 @@ function App() {
         onBtnClick={handleInstructionsClick}
         characters={characters}
         isGameRunning={isGameRunning}
-        // showLeaderboard={showLeaderboard}
+        showLeaderboard={showLeaderboard}
       />
       <img
         src={gameImage}
