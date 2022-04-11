@@ -27,8 +27,10 @@ const WinMessage = (props) => {
             type="text"
             id="name"
             name="name"
+            maxLength="24"
             required
             autoFocus
+            autoComplete="off"
           ></input>
           <button type="submit">Submit</button>
         </form>
