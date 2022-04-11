@@ -6,8 +6,6 @@ const Leaderboard = (props) => {
   const [score, setScore] = useState([]);
 
   useEffect(() => {
-    console.log('Component did mount');
-    // const colRef = collection(props.db, 'leaderboard');
     const q = query(props.colRef, orderBy('totalTime'));
 
     const showLeaderboard = async () => {
@@ -15,7 +13,6 @@ const Leaderboard = (props) => {
         let score = [];
         snapshot.docs.forEach((doc) => {
           const data = doc.data();
-          console.log(data);
           if (data.totalTime === null) {
             return;
           } else {
@@ -31,7 +28,6 @@ const Leaderboard = (props) => {
     };
 
     showLeaderboard().then((res) => {
-      console.log(res);
       setScore(res);
     });
   }, []);
