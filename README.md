@@ -1,4 +1,6 @@
-# Fourth React project done for [The Odin Project](https://www.theodinproject.com/lessons/node-path-javascript-where-s-waldo-a-photo-tagging-app)
+# Where's Waldo
+
+Fourth React project done for [The Odin Project](https://www.theodinproject.com/lessons/node-path-javascript-where-s-waldo-a-photo-tagging-app)
 
 Goals of the project:
 
