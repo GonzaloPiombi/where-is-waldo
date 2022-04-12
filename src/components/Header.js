@@ -13,20 +13,24 @@ const Header = (props) => {
 
   return (
     <header style={{ opacity: opacity }}>
-      <h1>Where's Waldo</h1>
-      <div>
-        {props.characters.map((character) => (
-          <img
-            style={{ opacity: character.found ? 0.2 : 1 }}
-            className="headshot"
-            src={character.image}
-            alt={character.name}
-            key={character.name}
-          />
-        ))}
+      <div className="header-section">
+        <h1>Where's Waldo</h1>
+        <div>
+          {props.characters.map((character) => (
+            <img
+              style={{ opacity: character.found ? 0.2 : 1 }}
+              className="headshot"
+              src={character.image}
+              alt={character.name}
+              key={character.name}
+            />
+          ))}
+        </div>
       </div>
-      <Timer isGameRunning={props.isGameRunning} />
-      <button onClick={props.showLeaderboard}>Leaderboard</button>
+      <div className="header-section">
+        <Timer isGameRunning={props.isGameRunning} />
+        <button onClick={props.showLeaderboard}>Leaderboard</button>
+      </div>
     </header>
   );
 };
