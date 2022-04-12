@@ -4,3 +4,5 @@ Goals of the project:
 
 - Introduction to the Back-end using BaaS (Firebase).
 - Further develop React skills.
+
+[Live demo](https://wheres-waldo-e3fac.web.app/)
