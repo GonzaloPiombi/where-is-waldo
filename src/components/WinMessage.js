@@ -27,7 +27,7 @@ const WinMessage = (props) => {
             type="text"
             id="name"
             name="name"
-            maxLength="24"
+            maxLength="18"
             required
             autoFocus
             autoComplete="off"
